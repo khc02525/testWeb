@@ -12,17 +12,13 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 script {
-                    // Tomcat webapps 경로
-                    def tomcatWebapps = "/usr/local/tomcat/webapps"
+                    // Tomcat 컨테이너 이름 (실제 이름 확인 필요)
+                    def tomcatContainer = "tomcat"
 
-                    // 기존 ROOT.war 삭제 (있을 경우)
+                    // 기존 ROOT.war 삭제 및 새 파일 복사
                     sh """
-                        rm -f ${tomcatWebapps}/ROOT.war
-                    """
-
-                    // GitHub에서 받은 root.war 복사
-                    sh """
-                        cp ROOT.war ${tomcatWebapps}/ROOT.war
+                        docker exec ${tomcatContainer} rm -f /usr/local/tomcat/webapps/ROOT.war
+                        docker cp ROOT.war ${tomcatContainer}:/usr/local/tomcat/webapps/ROOT.war
                     """
                 }
             }
@@ -31,11 +27,11 @@ pipeline {
         stage('Restart Tomcat') {
             steps {
                 script {
+                    def tomcatContainer = "tomcat"
                     sh """
-                        # Tomcat 재시작 (예시, 환경에 맞게 수정 필요)
-                        /usr/local/tomcat/bin/shutdown.sh || true
+                        docker exec ${tomcatContainer} /usr/local/tomcat/bin/shutdown.sh || true
                         sleep 5
-                        /usr/local/tomcat/bin/startup.sh
+                        docker exec ${tomcatContainer} /usr/local/tomcat/bin/startup.sh
                     """
                 }
             }
