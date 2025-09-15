@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        REGISTRY = "localhost:5050"
-        IMAGE_NAME = "my-tomcat-app"
-        DOCKERFILE_PATH = "tomcat/Dockerfile"
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -15,41 +9,36 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy to Tomcat') {
             steps {
                 script {
+                    // Tomcat webapps 경로
+                    def tomcatWebapps = "/usr/local/tomcat/webapps"
+
+                    // 기존 ROOT.war 삭제 (있을 경우)
                     sh """
-                    docker build -t localhost:5000/my-tomcat-app:latest -f tomcat/Dockerfile .
+                        rm -f ${tomcatWebapps}/ROOT.war
+                    """
+
+                    // GitHub에서 받은 root.war 복사
+                    sh """
+                        cp root.war ${tomcatWebapps}/ROOT.war
                     """
                 }
             }
         }
 
-        stage('Push to Local Registry') {
+        stage('Restart Tomcat') {
             steps {
                 script {
                     sh """
-                    docker push localhost:5000/my-tomcat-app:latest
+                        # Tomcat 재시작 (예시, 환경에 맞게 수정 필요)
+                        /usr/local/tomcat/bin/shutdown.sh || true
+                        sleep 5
+                        /usr/local/tomcat/bin/startup.sh
                     """
                 }
             }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    sh """
-                    docker compose -f docker-compose.yml up -d --build
-                    """
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline finished"
         }
     }
 }
-
