@@ -18,7 +18,7 @@ pipeline {
                     // 기존 ROOT.war 삭제 및 새 파일 복사
                     sh """
                         docker exec ${tomcatContainer} rm -f /usr/local/tomcat/webapps/ROOT.war
-                        docker cp ROOT.war ${tomcatContainer}:/usr/local/tomcat/webapps/ROOT.war
+                        docker cp ${env.WORKSPACE}/ROOT.war ${tomcatContainer}:/usr/local/tomcat/webapps/ROOT.war
                     """
                 }
             }
