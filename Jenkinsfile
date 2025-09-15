@@ -22,7 +22,7 @@ pipeline {
 
                     // GitHub에서 받은 root.war 복사
                     sh """
-                        cp root.war ${tomcatWebapps}/ROOT.war
+                        cp ROOT.war ${tomcatWebapps}/ROOT.war
                     """
                 }
             }
