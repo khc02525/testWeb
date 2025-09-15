@@ -14,11 +14,12 @@ pipeline {
                 script {
                     // Tomcat 컨테이너 이름 (실제 이름 확인 필요)
                     def tomcatContainer = "tomcat"
+                    def warFile = "${env.WORKSPACE}/ROOT.war"
 
                     // 기존 ROOT.war 삭제 및 새 파일 복사
                     sh """
                         docker exec ${tomcatContainer} rm -f /usr/local/tomcat/webapps/ROOT.war
-                        docker cp ${env.WORKSPACE}/ROOT.war ${tomcatContainer}:/usr/local/tomcat/webapps/ROOT.war
+                        docker cp ${warFile} ${tomcatContainer}:/usr/local/tomcat/webapps/ROOT.war
                     """
                 }
             }
